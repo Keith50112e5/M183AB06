@@ -1,6 +1,9 @@
 const { body, validationResult } = require("express-validator");
 const hashing = require("./hashing");
 const sqlite3 = require("sqlite3");
+const jwt = require("jsonwebtoken");
+const { posts } = require("./mock");
+const { auth } = require("./auth");
 
 let db;
 
@@ -22,6 +25,7 @@ const initializeAPI = async (app) => {
       .escape(),
     login
   );
+  app.get("/api/posts", (req, res) => res.json(posts));
 };
 
 const login = async (req, res) => {
@@ -39,11 +43,16 @@ const login = async (req, res) => {
 
   const hash = await hashing.password(password);
 
+  const secret = process.env.SECRET || "very_secret_;-)";
+
+  const token = jwt.sign({ username, password }, secret, { expiresIn: "1h" });
+
   const answer = `
     <h1>Answer</h1>
     <p>Username: ${username}</p>
     <p>Password: ${hash}</p>`;
-  res.send(answer);
+
+  res.json({ token, answer });
 };
 
 module.exports = { initializeAPI };
