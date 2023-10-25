@@ -1,7 +1,14 @@
 const { body, validationResult } = require("express-validator");
-const bcrypt = require("bcrypt");
+const hashing = require("./hashing");
+const sqlite3 = require("sqlite3");
+
+let db;
 
 const initializeAPI = async (app) => {
+  db = new sqlite3.Database("./AB04.db", (err) =>
+    err ? console.error(err.message) : console.log("Connected to the database.")
+  );
+
   app.post(
     "/api/login",
     body("username")
@@ -29,15 +36,13 @@ const login = async (req, res) => {
     );
 
   const { username, password } = req.body;
-  const salt = await bcrypt.genSalt();
-  const hash = await bcrypt.hash(password, salt);
+
+  const hash = await hashing.password(password);
 
   const answer = `
     <h1>Answer</h1>
     <p>Username: ${username}</p>
-    <p>Password: ${hash}</p>
-  `;
-
+    <p>Password: ${hash}</p>`;
   res.send(answer);
 };
 
