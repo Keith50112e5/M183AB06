@@ -20,7 +20,16 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const getPosts = async () => {
-    const response = await fetch("/api/posts", { method: "GET" });
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token"))
+      .split("=")[1];
+    const response = await fetch("/api/posts", {
+      method: "GET",
+      headers: {
+        authorization: token,
+      },
+    });
     const result = await response.json();
     const html = result
       .map(

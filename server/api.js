@@ -25,7 +25,7 @@ const initializeAPI = async (app) => {
       .escape(),
     login
   );
-  app.get("/api/posts", (req, res) => res.json(posts));
+  app.get("/api/posts", auth, (req, res) => res.json(posts));
 };
 
 const login = async (req, res) => {
