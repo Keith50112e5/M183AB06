@@ -7,27 +7,6 @@ let db;
 
 const jwtSecret = process.env.JWT_SECRET || "supersecret";
 
-const posts = [
-  {
-    id: 1,
-    title: "Introduction to JavaScript",
-    content:
-      "JavaScript is a dynamic language primarily used for web development...",
-  },
-  {
-    id: 2,
-    title: "Functional Programming",
-    content:
-      "Functional programming is a paradigm where functions take center stage...",
-  },
-  {
-    id: 3,
-    title: "Asynchronous Programming in JS",
-    content:
-      "Asynchronous programming allows operations to run in parallel without blocking the main thread...",
-  },
-];
-
 const initializeAPI = async (app) => {
   db = initializeDatabase();
   app.post(
@@ -44,7 +23,10 @@ const initializeAPI = async (app) => {
     login
   );
   app.get("/api/posts", getPosts);
+  app.post("/api/posts", addPost);
 };
+
+const addPost = async (req, res) => {};
 
 const login = async (req, res) => {
   // Validate request
@@ -89,7 +71,7 @@ const login = async (req, res) => {
   return res.send(token);
 };
 
-const getPosts = (req, res) => {
+const getPosts = async (req, res) => {
   const authorization = req.headers.authorization;
   if (!authorization) {
     return res.status(401).json({ error: "No authorization header." });
@@ -105,6 +87,11 @@ const getPosts = (req, res) => {
   if (!tokenValidation.data.roles?.includes("viewer")) {
     return res.status(403).json({ error: "You are not a viewer." });
   }
+
+  const getPostsQuery = `SELECT * FROM posts;`;
+
+  const posts = await queryDB(db, getPostsQuery);
+
   return res.send(posts);
 };
 
