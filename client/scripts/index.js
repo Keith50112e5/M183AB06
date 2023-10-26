@@ -10,8 +10,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const postContentInput = document.getElementById("postContent");
   const postAddButton = document.getElementById("postAdd");
 
+  const encrypt = (str) => {
+    const public = sessionStorage.getItem("private");
+    if (!public) return str;
+    const crypt = new JSEncrypt();
+    crypt.setKey(public);
+    return crypt.encrypt(str);
+  };
+  const decrypt = (str) => {
+    const private = sessionStorage.getItem("private");
+    if (!private) return str;
+    const crypt = new JSEncrypt();
+    crypt.setKey(private);
+    return crypt.decrypt(str);
+  };
+
   const getPosts = async () => {
-    if (!sessionStorage.getItem("token")) {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
       logoutButton.classList.add("hidden");
       postTitleInput.classList.add("hidden");
       postContentInput.classList.add("hidden");
@@ -22,20 +38,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const response = await fetch("/api/posts", {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     const posts = await response.json();
     for (const post of posts) {
       const postElement = document.createElement("div");
       postElement.innerHTML = `
-        <h3>${post.title}</h3>
-        <p>${post.content}</p>
+        <h3>${decrypt(post.title)}</h3>
+        <p>${decrypt(post.content)}</p>
       `;
       feed.appendChild(postElement);
     }
   };
   getPosts();
+
+  const saveKeys = async () => {
+    const response = await fetch("/api/keys");
+    const { public, private } = await response.json();
+    sessionStorage.setItem("public", public);
+    sessionStorage.setItem("private", private);
+  };
 
   const login = async (username, password) => {
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -56,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     const result = await response.text();
     if (!result) return;
+    await saveKeys();
     sessionStorage.setItem("token", result);
     logoutButton.classList.remove("hidden");
     postTitleInput.classList.remove("hidden");
@@ -81,12 +105,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   logoutButton.addEventListener("click", () => {
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("public");
+    sessionStorage.removeItem("private");
     location.reload();
   });
 
   postAddButton.addEventListener("click", async () => {
-    const title = postTitleInput.value;
-    const content = postContentInput.value;
+    const title = encrypt(postTitleInput.value);
+    const content = encrypt(postContentInput.value);
     const response = await fetch("/api/post/create", {
       method: "POST",
       headers: {

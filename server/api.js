@@ -2,6 +2,18 @@ const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const { initializeDatabase, queryDB, insertDB } = require("./database");
 const jwt = require("jsonwebtoken");
+const AES = require("aes-encryption");
+const RSA = require("node-rsa");
+
+const KeyLength = { b: 1024 };
+
+const key = new RSA(KeyLength);
+
+const aes = new AES();
+
+const aesSecret = process.env.AES_SECRET;
+
+aes.setSecretKey(aesSecret);
 
 let db;
 
@@ -24,6 +36,14 @@ const initializeAPI = async (app) => {
   );
   app.get("/api/posts", getPosts);
   app.post("/api/post/create", addPost);
+  app.get("/api/keys", getKeys);
+};
+
+const getKeys = (req, res) => {
+  key.generateKeyPair();
+  const public = key.exportKey("pkcs8-public-pem");
+  const private = key.exportKey("pkcs8-private-pem");
+  res.json({ public, private });
 };
 
 const addPost = async (req, res) => {
@@ -31,7 +51,7 @@ const addPost = async (req, res) => {
 
   const insertPostQuery = `
   INSERT INTO posts ('title', 'content') VALUES
-  ('${title}', '${content}');
+  ('${aes.encrypt(title)}', '${aes.encrypt(content)}');
   `;
   await insertDB(db, insertPostQuery);
   res.send("OK");
@@ -99,8 +119,16 @@ const getPosts = async (req, res) => {
 
   const getPostsQuery = `SELECT * FROM posts;`;
 
-  const posts = await queryDB(db, getPostsQuery);
+  const postsEncrypted = await queryDB(db, getPostsQuery);
 
+  const posts = postsEncrypted.map((post) => {
+    let { title, content } = post;
+    try {
+      title = aes.decrypt(title);
+      content = aes.decrypt(content);
+    } catch (err) {}
+    return { title, content };
+  });
   return res.send(posts);
 };
 

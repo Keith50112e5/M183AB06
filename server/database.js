@@ -1,7 +1,7 @@
-const sqlite3 = require("sqlite3").verbose();
+const { Database } = require("sqlite3").verbose();
 
 const initializeDatabase = () => {
-  const db = new sqlite3.Database("./my-database.db");
+  const db = new Database("./my-database.db");
   return db;
 };
 
