@@ -1,4 +1,5 @@
 node_modules
-minitwitter.db
+my-database.db
 .env
 jsencrypt-master
+logs

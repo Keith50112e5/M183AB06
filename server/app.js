@@ -3,6 +3,7 @@ const express = require("express");
 const http = require("http");
 const { rateLimit } = require("express-rate-limit");
 const { initializeAPI } = require("./api");
+const pino = require("pino-http")();
 
 // Create the express server
 const app = express();
@@ -15,6 +16,7 @@ const limiter = rateLimit({
 // Apply the rate limiting middleware to all requests
 app.use(limiter);
 app.use(express.json());
+app.use(pino);
 const server = http.createServer(app);
 
 // deliver static files from the client folder like css, js, images

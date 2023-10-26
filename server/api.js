@@ -40,6 +40,7 @@ const initializeAPI = async (app) => {
 };
 
 const getKeys = (req, res) => {
+  req.log.info("Benutzer verlangt RSA Schlüssel.");
   key.generateKeyPair();
   const public = key.exportKey("pkcs8-public-pem");
   const private = key.exportKey("pkcs8-private-pem");
@@ -47,17 +48,18 @@ const getKeys = (req, res) => {
 };
 
 const addPost = async (req, res) => {
+  req.log.info("Benutzer fügt einen Post hinzu.");
   const { title, content } = req.body;
 
   const insertPostQuery = `
   INSERT INTO posts ('title', 'content') VALUES
-  ('${aes.encrypt(title)}', '${aes.encrypt(content)}');
-  `;
+  ('${aes.encrypt(title)}', '${aes.encrypt(content)}');  `;
   await insertDB(db, insertPostQuery);
   res.send("OK");
 };
 
 const login = async (req, res) => {
+  req.log.info("Benutzer loggt sich ein.");
   // Validate request
   const result = validationResult(req);
   if (!result.isEmpty()) {
@@ -101,6 +103,7 @@ const login = async (req, res) => {
 };
 
 const getPosts = async (req, res) => {
+  req.log.info("Benutzer liest Posts aus.");
   const authorization = req.headers.authorization;
   if (!authorization) {
     return res.status(401).json({ error: "No authorization header." });
