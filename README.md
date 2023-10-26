@@ -22,3 +22,9 @@
    ```sh
    http://localhost:3000
    ```
+
+## Testuser
+
+| Username                      | Password   |
+| ----------------------------- | ---------- |
+| patrick.michel@digital4you.ch | 1234567890 |
