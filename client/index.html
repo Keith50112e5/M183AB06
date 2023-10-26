@@ -15,12 +15,34 @@
     <header class="flex flex-col items-center flex-shrink-0 gap-4 pt-3">
       <img src="/img/logo.png" class="w-48 h-48 rounded-full" />
       <h1 class="text-2xl font-bold">🚀 M183 - Starter 🚀</h1>
-      <button
-        id="logout"
-        class="px-4 py-2 bg-red-500 rounded hover:bg-red-400"
-      >
-        Logout
-      </button>
+      <input
+            id="postTitle"
+            placeholder="Title"
+            type="text"
+            value="title"
+            required
+            class="w-full p-2 px-4 placeholder-gray-200 rounded bg-slate-400 grow"
+          />
+      <input
+      id="postContent"
+      placeholder="Content"
+      type="text"
+      value="this is content!"
+      required
+      class="w-full p-2 px-4 placeholder-gray-200 rounded bg-slate-400 grow"
+    />
+    <button
+      id="postAdd"
+      class="px-4 py-2 bg-red-500 rounded hover:bg-red-400"
+    >
+      Add
+    </button>
+    <button
+      id="logout"
+      class="px-4 py-2 bg-red-500 rounded hover:bg-red-400"
+    >
+      Logout
+    </button>
     </header>
     <main class="flex flex-col w-full max-w-md gap-2 overflow-y-auto grow">
       <div class="flex flex-col gap-2 grow">
@@ -30,6 +52,7 @@
             id="username"
             placeholder="Username"
             type="email"
+            value="keithyannick.hager@gmail.com"
             required
             class="w-full p-2 px-4 placeholder-gray-200 rounded bg-slate-400 grow"
           />
@@ -37,6 +60,7 @@
             id="password"
             placeholder="Password"
             type="password"
+            value="01234567890"
             required
             class="w-full p-2 px-4 placeholder-gray-200 rounded bg-slate-400 grow"
           />

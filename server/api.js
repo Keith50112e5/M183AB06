@@ -1,6 +1,6 @@
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
-const { initializeDatabase, queryDB } = require("./database");
+const { initializeDatabase, queryDB, insertDB } = require("./database");
 const jwt = require("jsonwebtoken");
 
 let db;
@@ -23,10 +23,19 @@ const initializeAPI = async (app) => {
     login
   );
   app.get("/api/posts", getPosts);
-  app.post("/api/posts", addPost);
+  app.post("/api/post/create", addPost);
 };
 
-const addPost = async (req, res) => {};
+const addPost = async (req, res) => {
+  const { title, content } = req.body;
+
+  const insertPostQuery = `
+  INSERT INTO posts ('title', 'content') VALUES
+  ('${title}', '${content}');
+  `;
+  await insertDB(db, insertPostQuery);
+  res.send("OK");
+};
 
 const login = async (req, res) => {
   // Validate request

@@ -6,14 +6,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const bruteForceButton = document.getElementById("bruteForce");
   const resultText = document.getElementById("result");
   const logoutButton = document.getElementById("logout");
+  const postTitleInput = document.getElementById("postTitle");
+  const postContentInput = document.getElementById("postContent");
+  const postAddButton = document.getElementById("postAdd");
 
   const getPosts = async () => {
     if (!sessionStorage.getItem("token")) {
       logoutButton.classList.add("hidden");
+      postTitleInput.classList.add("hidden");
+      postContentInput.classList.add("hidden");
+      postAddButton.classList.add("hidden");
       return;
     }
     feed.innerHTML = "";
     const response = await fetch("/api/posts", {
+      method: "GET",
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
@@ -51,6 +58,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!result) return;
     sessionStorage.setItem("token", result);
     logoutButton.classList.remove("hidden");
+    postTitleInput.classList.remove("hidden");
+    postContentInput.classList.remove("hidden");
+    postAddButton.classList.remove("hidden");
     getPosts();
   };
 
@@ -72,5 +82,18 @@ document.addEventListener("DOMContentLoaded", () => {
   logoutButton.addEventListener("click", () => {
     sessionStorage.removeItem("token");
     location.reload();
+  });
+
+  postAddButton.addEventListener("click", async () => {
+    const title = postTitleInput.value;
+    const content = postContentInput.value;
+    const response = await fetch("/api/post/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title, content }),
+    });
+    getPosts();
   });
 });

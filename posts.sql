@@ -10,5 +10,4 @@ INSERT INTO posts ("title", "content") VALUES
     ("Functional Programming","Functional programming is a paradigm where functions take center stage..."),
     ("Asynchronous Programming in JS","Asynchronous programming allows operations to run in parallel without blocking the main thread...")
 ;
-
 SELECT * FROM posts;
