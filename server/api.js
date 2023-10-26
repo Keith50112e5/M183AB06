@@ -1,6 +1,6 @@
 const { body, validationResult } = require("express-validator");
 const hashing = require("./hashing");
-const sqlite3 = require("sqlite3");
+const { Database } = require("sqlite3");
 const jwt = require("jsonwebtoken");
 const { posts } = require("./mock");
 const { auth } = require("./auth");
@@ -8,7 +8,7 @@ const { auth } = require("./auth");
 let db;
 
 const initializeAPI = async (app) => {
-  db = new sqlite3.Database("./AB04.db", (err) =>
+  db = new Database("./AB04.db", (err) =>
     err ? console.error(err.message) : console.log("Connected to the database.")
   );
 
